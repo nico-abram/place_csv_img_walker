@@ -8,3 +8,6 @@ edition = "2021"
 clap = { version = "3.1.8", features = ["derive"] }
 btoi = "0.4.2"
 image = "0.24.1"
+
+[profile.release]
+debug = true
