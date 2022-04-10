@@ -29,6 +29,9 @@ struct Args {
     #[clap(short, long)]
     find_admin_rects: bool,
 }
+// Example usage:
+//  cargo run --release -- --csv-path .\data\2022_rplace_cleaned.csv --out-path out.png --in-path .\150000000.png --lines-to-do 6028080 --lines-to-skip 150000000
+//  cargo run --release -- --csv-path .\data\2022_rplace_cleaned.csv --runs-of-white --out-path none
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
@@ -42,28 +45,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     reader.read_line(&mut buffer).unwrap();
     buffer.clear();
 
-    if args.find_admin_rects {
-        let mut admin_rect_count = 0;
-        while let Ok(_) = reader.read_line(&mut buffer) {
-            c += 1;
-            let line = buffer.trim();
-            if line.is_empty() {
-                break;
-            }
-            if c % 1000000 == 0 {}
-
-            let is_admin_rect = buffer.matches(",").count() != 4;
-            if is_admin_rect {
-                admin_rect_count += 1;
-                println!("Found admin rect at line {}: {}", c, line);
-            }
-
-            buffer.clear();
-        }
-        println!("Found {} admin rectangles in {} lines", admin_rect_count, c);
-
-        return Ok(());
-    }
     if args.runs_of_white {
         let mut last_non_white = 0;
         let mut was_white = false;
@@ -73,8 +54,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if line.is_empty() {
                 break;
             }
-            if c % 1000000 == 0 {
-                println!("lnw:{}", last_non_white);
+            if c % 10000000 == 0 {
+                println!("Progress:{}", last_non_white);
             }
 
             was_white = buffer.contains(",#FFFFFF,");
@@ -162,7 +143,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
         //total: 160350000
         if c % 1000000 == 0 {
-            println!("{}: x:{} y:{} col: {} {} {}", c, x, y, r, g, b);
+            println!(
+                "Progress line {}: x:{} y:{} col: {} {} {}",
+                c, x, y, r, g, b
+            );
         }
         let idx = (x as usize) + (y as usize) * 2000;
         image[idx * 4 + 0] = r;
